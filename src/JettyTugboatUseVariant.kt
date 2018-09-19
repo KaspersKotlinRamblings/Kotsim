@@ -5,12 +5,12 @@ fun main(args: Array<String>) = Simu {
 
     fun Boat(start: Int, name: String = "") = buildSimProcess(name) {
         hold(start)
-        use(jetty, 1) {
-            use(tug, 2) {
+        jetty.use( 1) {
+            tug.use(2) {
                 hold(2)
             }
             hold(14)
-            use(tug, 1) {
+            tug.use( 1) {
                 hold(1)
             }
         }

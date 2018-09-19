@@ -1,4 +1,11 @@
-/*import java.util.*
+import java.lang.IllegalStateException
+import java.util.*
+import kotlin.coroutines.*
+
+typealias SimStep = Continuation<Unit>
+typealias Time = Int
+
+
 
 fun Simu( block : Simulation.()->Unit) {
     val simulation = Simulation()
@@ -7,24 +14,49 @@ fun Simu( block : Simulation.()->Unit) {
 
 }
 
-class DummyYield
-
 open class Simulation {
     // at some point this will be a proper enumeration, a command pattern or something third
 
-    class SimProcess(val iterator: Iterator<DummyYield>, var nextTime: Int, val name: String = "")
+    interface SimulationProcess {
+        suspend fun pause()
+    }
 
-    fun simProcess(name: String = "", block: suspend SequenceBuilder<DummyYield>.() -> Unit): SimProcess {
-        val myIterator = buildSequence<DummyYield>(
-                {
-                    log("starting $name")
-                    block()
-                    log("terminating $name")
-                }
-        ).iterator()
-        val process = SimProcess(myIterator, now, name)
-        queue.add(process)
-        return process
+    fun buildSimProcess(name: String = "SimProcess", block: suspend SimulationProcess.() -> Unit): SimProcess  {
+        fun surround ( prim: suspend SimulationProcess.()->Unit, inBlock : suspend SimulationProcess.()->Unit): suspend  SimProcess.()-> Unit {
+            return inBlock
+        }
+
+        val co = SimProcess(name)
+        val blk = surround(block) {
+            log("starting $name")
+            block(co)
+            println("terminating $name")
+        }
+        co.nextStep = blk.createCoroutine(co, co)
+        queue.add(co)
+        return co
+    }
+
+    class SimProcess(val name: String) : SimulationProcess, SimStep {
+        override val context: CoroutineContext get() = EmptyCoroutineContext
+        lateinit var nextStep: SimStep
+        private var done = false;
+
+        val isDone get() = done
+        var nextTime: Time = 0
+
+        override fun resumeWith(result: SuccessOrFailure<Unit>) {
+            done=true
+        }
+
+        fun resume() {
+            if (done) throw IllegalStateException("Cannot resume finished SimpleCoroutine")
+            nextStep.resume(Unit)
+        }
+
+        override suspend fun pause() {
+            return suspendCoroutine { continuation -> this.nextStep = continuation }
+        }
     }
 
     inner class Resource(val capacity: Int, val name: String = "res") {
@@ -32,6 +64,10 @@ open class Simulation {
 
         var idleCount = capacity
         val waiting: Queue<ResourceRequest> = ArrayDeque<ResourceRequest>()
+
+        suspend fun use(amount: Int, block: suspend () -> Unit){
+            this@Simulation.use(this, amount, block)
+        }
     }
 
     private var queue = PriorityQueue<SimProcess>(10) { a, b -> a.nextTime - b.nextTime }
@@ -41,15 +77,15 @@ open class Simulation {
     private var now: Int = 0
 
 
-    suspend fun SequenceBuilder<DummyYield>.hold(holdTime: Int) {
+    suspend fun hold(holdTime: Int) {
         with(current) {
             nextTime = now + holdTime
             queue.add(current)
         }
-        yield(DummyYield())
+        current.pause()
     }
 
-    suspend fun SequenceBuilder<DummyYield>.acquire(res: Resource, amount: Int = 1) {
+    suspend fun acquire(res: Resource, amount: Int = 1) {
         with(res) {
             if (idleCount >= amount) { // We have what is asked for
                 log("taking resource ${res.name}[$amount/$idleCount]")
@@ -57,12 +93,12 @@ open class Simulation {
             } else { // not enough idle resources
                 log("awaiting resource ${res.name}[$amount/$idleCount]")
                 waiting.add(ResourceRequest(current, amount))
-                yield(DummyYield())
+                current.pause()
             }
         }
     }
 
-    suspend fun SequenceBuilder<DummyYield>.release(res: Resource, amount: Int = 1) {
+    suspend fun release(res: Resource, amount: Int = 1) {
         with(res) {
             if (waiting.size > 0) { // is anyone waiting to grab the released resources
                 val waitFor = waiting.peek().amount // what is the first in the queue waiting for
@@ -85,7 +121,7 @@ open class Simulation {
         }
     }
 
-    suspend fun SequenceBuilder<DummyYield>.use(res: Resource, amount: Int = 1, block: suspend SequenceBuilder<DummyYield>.() -> Unit) {
+    suspend fun use(res: Resource, amount: Int = 1, block: suspend () -> Unit) {
         acquire(res, amount)
         block()
         release(res, amount)
@@ -99,14 +135,15 @@ open class Simulation {
         while (queue.isNotEmpty()) {
             current = queue.poll()
             now = current.nextTime
-            if (current.iterator.hasNext()) {
+            if (! current.isDone) {
                 log("resuming ${current.name}")
-                current.iterator.next()
+                current.resume()
             }
         }
     }
 }
 
 
-*/
+
+
 
