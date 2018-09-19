@@ -36,7 +36,7 @@ open class Simulation {
 
     private var queue = PriorityQueue<SimProcess>(10) { a, b -> a.nextTime - b.nextTime }
 
-    private var current: SimProcess = SimProcess(emptySequence<DummyYield>().iterator(), -1, "None")
+    private lateinit var current: SimProcess
 
     private var now: Int = 0
 
