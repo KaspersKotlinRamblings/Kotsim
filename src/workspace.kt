@@ -36,7 +36,7 @@ class AAA {
 }
 
 
-fun main(args: Array<String>) {
+fun main(args: Array<String>) = bla {
     //println(aaa().toList())
     val f = Fibbe { println("Making fibbes $aaa") }
     println("Done ${f.aaa}")
@@ -50,3 +50,8 @@ class Fibbe (val body: Fibbe.()->Unit){
     }
 }
 
+fun bla (block : ()->Unit){
+    println("Before")
+    block()
+    println("After")
+}

@@ -1,8 +1,16 @@
 import java.util.*
 
+fun Simu( block : Simulation.()->Unit) {
+    val simulation = Simulation()
+    block(simulation)
+    simulation.runSimulation()
+
+}
+
+class DummyYield
+
 open class Simulation {
     // at some point this will be a proper enumeration, a command pattern or something third
-    class DummyYield
 
     class SimProcess(val iterator: Iterator<DummyYield>, var nextTime: Int, val name: String = "")
 
