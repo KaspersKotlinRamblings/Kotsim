@@ -1,14 +1,14 @@
 fun main(args: Array<String>) {
 
     val mySim =  object: Simulation() {
-        val helloProcess = simProcess("hello") {
+        val helloProcess = buildSimProcess("hello") {
             hold(10)
-            val newProcess = simProcess("inner") {
+            val newProcess = buildSimProcess("inner") {
                 hold(12)
             }
             hold(7)
         }
-        val hiProcesse = simProcess("hi") {
+        val hiProcesse = buildSimProcess("hi") {
             for (i in 1..12) {
                 hold( i )
             }

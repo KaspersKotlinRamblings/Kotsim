@@ -2,7 +2,7 @@ fun main(args: Array<String>) = Simu {
     val jetty = Resource(2, "Jetty") // Original demos: 2
     val tug = Resource(3, "Tug") // Original demos: 3
 
-    fun Boat(start: Int, name: String = "") = simProcess(name) {
+    fun Boat(start: Int, name: String = "") = buildSimProcess(name) {
         hold(start)
         acquire(jetty, 1)
             acquire(tug, 2)

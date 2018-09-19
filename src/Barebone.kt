@@ -10,17 +10,8 @@ fun syvnitretten2() = buildCoroutine<Int> {
 
 fun main(args: Array<String>) {
     val ddd = syvnitretten2()
-    /*print("<${ddd.resume()}>")
-    print("<${ddd.resume()}>")
-    print("<${ddd.resume()}>")
-
-
-    print("<${ddd.resume()}>")
-    if (ddd.isDone) {
-        println();println("End of story")
-    }*/
     while (!ddd.isDone)
         println("<${ddd.resume()}>")
-    println();println("End of story")
+    println("End of story")
 }
 
