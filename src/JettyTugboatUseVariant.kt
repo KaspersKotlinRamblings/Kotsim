@@ -1,4 +1,6 @@
-fun main(args: Array<String>) = Simu {
+import kotsim.Simulation
+
+fun main(args: Array<String>) = Simulation {
 
     val jetty = Resource(2, "Jetty") // Original demos: 2
     val tug = Resource(3, "Tug") // Original demos: 3
