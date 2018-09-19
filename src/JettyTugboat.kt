@@ -1,24 +1,22 @@
 fun main(args: Array<String>) {
+    object: Simulation() {
+        val jetty = Resource(2,"Jetty") // Original demos: 2
+        val tug = Resource(3, "Tug") // Original demos: 3
 
-    val mySim =  object: Simulation() {
-        val jetty = Resource(2)
-        val tug = Resource(3)
-
-        fun Boat(start: Int) = SimProcess {
+        fun Boat(start: Int, name: String ="" ) = simProcess(name) {
             hold(start)
-            acquire(jetty)
-                acquire(tug)
+            acquire(jetty,1)
+                acquire(tug,2)
                     hold(2)
-                release(tug)
+                release(tug,2)
                 hold(14)
-                acquire(tug)
+                acquire(tug,1)
                     hold(1)
-                release(tug)
-            release(jetty)
+                release(tug,1)
+            release(jetty,1)
         }
-        val boat1=Boat(0)
-        val boat2=Boat(1)
-        val boat3=Boat(15)
-    }
-    mySim.runSimulation()
+        val boat1=Boat(0,"Boat1")
+        val boat2=Boat(1, "Boat2")
+        val boat3=Boat(7, "Boat3")
+    }.runSimulation()
 }
