@@ -1,9 +1,11 @@
-import kotsim.Simulation
+package samples
 
-fun main(args: Array<String>) = Simulation {
+import kotsim.simulation
 
-    val jetty = Resource(2, "Jetty") // Original demos: 2
-    val tug = Resource(3, "Tug") // Original demos: 3
+fun main(args: Array<String>) = simulation {
+
+    val jetty = buildResource(2, "Jetty") // Original demos: 2
+    val tug = buildResource(3, "Tug") // Original demos: 3
 
     fun Boat(start: Int, name: String = "") = buildSimProcess(name) {
         hold(start)
@@ -17,9 +19,8 @@ fun main(args: Array<String>) = Simulation {
             }
         }
     }
-
-    val boat1 = Boat(0, "Boat1")
-    val boat2 = Boat(1, "Boat2")
-    val boat3 = Boat(7, "Boat3")
+    Boat(0, "Boat1")
+    Boat(1, "Boat2")
+    Boat(7, "Boat3")
 
 }
