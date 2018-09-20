@@ -4,7 +4,7 @@ typealias Time = Long
 
 fun simulation(block: Simulation.() -> Unit) {
     val simulation = SimulationClass()
-    block(simulation)
+    simulation.block()
     simulation.runSimulation()
 }
 
@@ -14,12 +14,11 @@ interface Simulation {
 
     fun simulationProcess(name: String = "SimProcess", block: suspend SimulationProcess.() -> Unit): SimulationProcess
     fun resource(capacity: Int, name: String = "res") : Resource
-    
+
     fun log(msg: String)
 }
 
 interface SimulationProcess {
-    suspend fun pause()
     suspend fun hold(holdTime: Int)
 }
 

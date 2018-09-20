@@ -4,7 +4,7 @@ import java.lang.IllegalStateException
 import java.util.*
 import kotlin.coroutines.*
 
-private typealias SimStep = Continuation<Unit>
+private typealias CoroutineStep = Continuation<Unit>
 
 internal class SimulationClass : Simulation {
 
@@ -17,7 +17,7 @@ internal class SimulationClass : Simulation {
         val co = SimProcess(name)
         val blk = wrap {
             log("starting $name")
-            block(co)
+            co.block()
             log("terminating $name")
         }
         co.nextStep = blk.createCoroutine(co, co)
@@ -28,9 +28,9 @@ internal class SimulationClass : Simulation {
     override fun resource(capacity: Int, name: String) : Resource{
         return ResourceClass(capacity,name)
     }
-    internal inner class SimProcess(val name: String) : SimulationProcess, SimStep {
+    internal inner class SimProcess(val name: String) : SimulationProcess, CoroutineStep {
         override val context: CoroutineContext get() = EmptyCoroutineContext
-        internal lateinit var nextStep: SimStep
+        internal lateinit var nextStep: CoroutineStep
         private var done = false
 
         internal val isDone get() = done
@@ -45,7 +45,7 @@ internal class SimulationClass : Simulation {
             nextStep.resume(Unit)
         }
 
-        override suspend fun pause() {
+        suspend fun pause() {
             return suspendCoroutine { continuation -> this.nextStep = continuation }
         }
 
