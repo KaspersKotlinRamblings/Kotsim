@@ -12,8 +12,9 @@ interface Simulation {
     val now: Time
     val current: SimulationProcess
 
-    fun buildSimProcess(name: String = "SimProcess", block: suspend SimulationProcess.() -> Unit): SimulationProcess
-    fun buildResource(capacity: Int, name: String = "res") : Resource
+    fun simulationProcess(name: String = "SimProcess", block: suspend SimulationProcess.() -> Unit): SimulationProcess
+    fun resource(capacity: Int, name: String = "res") : Resource
+    
     fun log(msg: String)
 }
 

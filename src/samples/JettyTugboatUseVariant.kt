@@ -4,10 +4,10 @@ import kotsim.simulation
 
 fun main(args: Array<String>) = simulation {
 
-    val jetty = buildResource(2, "Jetty") // Original demos: 2
-    val tug = buildResource(3, "Tug") // Original demos: 3
+    val jetty = resource(2, "Jetty") // Original demos: 2
+    val tug = resource(3, "Tug") // Original demos: 3
 
-    fun Boat(start: Int, name: String = "") = buildSimProcess(name) {
+    fun boat(start: Int, name: String = "") = simulationProcess(name) {
         hold(start)
         jetty.use( 1) {
             tug.use(2) {
@@ -19,8 +19,8 @@ fun main(args: Array<String>) = simulation {
             }
         }
     }
-    Boat(0, "Boat1")
-    Boat(1, "Boat2")
-    Boat(7, "Boat3")
+    boat(0, "Boat1")
+    boat(1, "Boat2")
+    boat(7, "Boat3")
 
 }

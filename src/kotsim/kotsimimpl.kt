@@ -9,7 +9,7 @@ private typealias SimStep = Continuation<Unit>
 internal class SimulationClass : Simulation {
 
 
-    override fun buildSimProcess(name: String, block: suspend SimulationProcess.() -> Unit): SimulationProcess {
+    override fun simulationProcess(name: String, block: suspend SimulationProcess.() -> Unit): SimulationProcess {
         fun wrap(inBlock: suspend SimulationProcess.() -> Unit): suspend SimulationProcess.() -> Unit {
             return inBlock
         }
@@ -25,7 +25,7 @@ internal class SimulationClass : Simulation {
         return co
     }
 
-    override fun buildResource(capacity: Int, name: String) : Resource{
+    override fun resource(capacity: Int, name: String) : Resource{
         return ResourceClass(capacity,name)
     }
     internal inner class SimProcess(val name: String) : SimulationProcess, SimStep {
